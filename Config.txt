@@ -1,0 +1,6 @@
+width;500
+height;400
+lineThickness;10
+elementsColor;60, 179, 113
+padColor;141, 58, 176
+ballColor;255, 165, 0

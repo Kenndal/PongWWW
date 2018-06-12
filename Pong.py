@@ -1,29 +1,36 @@
 import pygame
 from pygame.locals import *
 import sys
+import FileManager
+
+# read config file
+FileManager.readFile()
 
 # frame per second
-fps = 150
+fps = 200
+
 scoreSpace = 50  # free space under area to display scores
-windowWidth = 400
-windowHeight = 400
+windowWidth = int(FileManager.programElements['width'])
+windowHeight = int(FileManager.programElements['height'])
 areaHeight = windowHeight - scoreSpace
-lineThickness = 10  # thickness of lines in program
+lineThickness = int(FileManager.programElements['lineThickness'])  # thickness of lines in program
 padSize = 50  # size of game pad
 padDistance = 20  # distance from the area edges
 
 # set up the colors
-backgroundColor = (0, 0, 0)
-elementsColor = (255, 255, 255)
+# background color is always black
+borderLinesColor = eval(FileManager.programElements['elementsColor'])
+padColor = eval(FileManager.programElements['padColor'])
+ballColor = eval(FileManager.programElements['ballColor'])
 
 
 # function to draw game area
 def drawArea():
     displaySurf.fill((0, 0, 0))
     # draw border lines
-    pygame.draw.rect(displaySurf, elementsColor, ((0, 0), (windowWidth, areaHeight)), lineThickness * 2)
+    pygame.draw.rect(displaySurf, borderLinesColor, ((0, 0), (windowWidth, areaHeight)), lineThickness * 2)
     # draw center line
-    pygame.draw.line(displaySurf, elementsColor, ((windowWidth / 2), 0), ((windowWidth / 2), areaHeight),
+    pygame.draw.line(displaySurf, borderLinesColor, ((windowWidth / 2), 0), ((windowWidth / 2), areaHeight),
                      int(lineThickness / 2))
 
 
@@ -36,12 +43,12 @@ def drawPad(pad):
     elif pad.top < lineThickness:
         pad.top = lineThickness  # lineThickness is the highest point of area
     # draw pad
-    pygame.draw.rect(displaySurf, elementsColor, pad)
+    pygame.draw.rect(displaySurf, padColor, pad)
 
 
 # draw ball
 def drawBall(ball):
-    pygame.draw.rect(displaySurf, elementsColor, ball)
+    pygame.draw.rect(displaySurf, ballColor, ball)
 
 
 # function to changing the ball's position
@@ -98,33 +105,46 @@ def checkPointScoredPlayerTwo(ball, score):
         return score
 
 
+# Display players score in the bottom of screen
 def displayScore(scorePlayerOne, scorePlayerTwo):
-    resultSurfOne = basicFont.render('Player 1 = %s' % scorePlayerOne, True, elementsColor)
+    resultSurfOne = basicFont.render('Player 1 = %s' % scorePlayerOne, True, borderLinesColor)
     resultRectOne = resultSurfOne.get_rect()
     resultRectOne = (windowWidth - 150, windowHeight-30)
     displaySurf.blit(resultSurfOne,resultRectOne)
 
-    resultSurfTwo = basicFont.render('Player 2 = %s' % scorePlayerTwo, True, elementsColor)
+    resultSurfTwo = basicFont.render('Player 2 = %s' % scorePlayerTwo, True, borderLinesColor)
     resultRectTwo = resultSurfTwo.get_rect()
     resultRectTwo = (40, windowHeight - 30)
     displaySurf.blit(resultSurfTwo, resultRectTwo)
 
 
+# Pause game and display same features of program
 def paused():
 
     reset = False
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(1)
-
-    pauseSurf = basicFont.render('Paused', True, elementsColor)
+    # display "Pause" word
+    pauseSurf = basicFont.render('Paused', True, borderLinesColor)
     pauseRect = pauseSurf.get_rect()
-    pauseRect = (windowWidth/2 + 30, windowHeight/4)
+    pauseRect = (windowWidth/2 + windowWidth/15, windowHeight/4)
     displaySurf.blit(pauseSurf, pauseRect)
 
     pause = True
     # prepare buttons
     continueButton = pygame.Rect((windowWidth/4, windowHeight/3), (windowWidth/2, windowHeight/7))
+    #
+    continueSurf = basicFont.render('Continue', True, borderLinesColor)
+    continueRect = continueSurf.get_rect()
+    continueRect = (windowWidth / 4 + windowWidth/15, windowHeight / 3 + windowHeight/20)
+    displaySurf.blit(continueSurf, continueRect)
+
     resetButton = pygame.Rect((windowWidth/4, windowHeight/2), (windowWidth/2, windowHeight/7))
+    resetSurf = basicFont.render('Reset', True, borderLinesColor)
+    resetRect = resetSurf.get_rect()
+    resetRect = (windowWidth / 4 + windowWidth / 15, windowHeight / 2 + windowHeight / 20)
+    displaySurf.blit(resetSurf, resetRect)
+
     # pause loop
     while pause:
         for event in pygame.event.get():
@@ -140,8 +160,8 @@ def paused():
                     pause = False
 
         # draw buttons
-        pygame.draw.rect(displaySurf, elementsColor, continueButton, int(lineThickness/4))
-        pygame.draw.rect(displaySurf, elementsColor, resetButton, int(lineThickness/4))
+        pygame.draw.rect(displaySurf, borderLinesColor, continueButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, borderLinesColor, resetButton, int(lineThickness / 4))
 
         pygame.display.update()
         clock.tick(fps)
@@ -217,23 +237,23 @@ def main():  # main function
         if keys[pygame.K_UP]:
             pad1.y += -3
         if keys[pygame.K_1]:
-            ballSpeed = 1
+            ballSpeed = 0.5
         if keys[pygame.K_2]:
-            ballSpeed = 1.2
+            ballSpeed = 0.55
         if keys[pygame.K_3]:
-            ballSpeed = 1.4
+            ballSpeed = 0.6
         if keys[pygame.K_4]:
-            ballSpeed = 1.5
+            ballSpeed = 0.65
         if keys[pygame.K_5]:
-            ballSpeed = 1.6
+            ballSpeed = 0.7
         if keys[pygame.K_6]:
-            ballSpeed = 1.7
+            ballSpeed = 0.75
         if keys[pygame.K_7]:
-            ballSpeed = 1.8
+            ballSpeed = 0.8
         if keys[pygame.K_8]:
-            ballSpeed = 1.9
+            ballSpeed = 0.9
         if keys[pygame.K_9]:
-            ballSpeed = 2
+            ballSpeed = 1
 
         drawArea()
         drawBall(ball)
