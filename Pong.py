@@ -2,6 +2,8 @@ import pygame
 from pygame.locals import *
 import sys
 import FileManager
+from PIL import Image
+
 
 # read config file
 FileManager.readFile()
@@ -22,6 +24,7 @@ padDistance = 20  # distance from the area edges
 borderLinesColor = eval(FileManager.programElements['elementsColor'])
 padColor = eval(FileManager.programElements['padColor'])
 ballColor = eval(FileManager.programElements['ballColor'])
+menuColor = eval(FileManager.programElements['menuColor'])
 
 
 # function to draw game area
@@ -125,7 +128,7 @@ def paused():
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(1)
     # display "Pause" word
-    pauseSurf = basicFont.render('Paused', True, borderLinesColor)
+    pauseSurf = basicFont.render('Paused', True, menuColor)
     pauseRect = pauseSurf.get_rect()
     pauseRect = (windowWidth/2 + windowWidth/15, windowHeight/4)
     displaySurf.blit(pauseSurf, pauseRect)
@@ -134,16 +137,22 @@ def paused():
     # prepare buttons
     continueButton = pygame.Rect((windowWidth/4, windowHeight/3), (windowWidth/2, windowHeight/7))
     #
-    continueSurf = basicFont.render('Continue', True, borderLinesColor)
+    continueSurf = basicFont.render('Continue', True, menuColor)
     continueRect = continueSurf.get_rect()
     continueRect = (windowWidth / 4 + windowWidth/15, windowHeight / 3 + windowHeight/20)
     displaySurf.blit(continueSurf, continueRect)
 
     resetButton = pygame.Rect((windowWidth/4, windowHeight/2), (windowWidth/2, windowHeight/7))
-    resetSurf = basicFont.render('Reset', True, borderLinesColor)
+    resetSurf = basicFont.render('Reset', True, menuColor)
     resetRect = resetSurf.get_rect()
     resetRect = (windowWidth / 4 + windowWidth / 15, windowHeight / 2 + windowHeight / 20)
     displaySurf.blit(resetSurf, resetRect)
+
+    insButton = pygame.Rect((windowWidth / 4, 2 * windowHeight / 3), (windowWidth / 2, windowHeight / 7))
+    insSurf = basicFont.render('Instruction', True, menuColor)
+    insRect = insSurf.get_rect()
+    insRect = (windowWidth / 4 + windowWidth / 15, 2 * windowHeight / 3 + windowHeight / 20)
+    displaySurf.blit(insSurf, insRect)
 
     # pause loop
     while pause:
@@ -158,11 +167,14 @@ def paused():
                 if resetButton.collidepoint(mouse_pos):
                     reset = True
                     pause = False
+                if insButton.collidepoint(mouse_pos):
+                    img = Image.open("PongIns.png")
+                    img.show()
 
         # draw buttons
-        pygame.draw.rect(displaySurf, borderLinesColor, continueButton, int(lineThickness / 4))
-        pygame.draw.rect(displaySurf, borderLinesColor, resetButton, int(lineThickness / 4))
-
+        pygame.draw.rect(displaySurf, menuColor, continueButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, menuColor, resetButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, menuColor, insButton, int(lineThickness / 4))
         pygame.display.update()
         clock.tick(fps)
     return reset
@@ -176,7 +188,7 @@ def main():  # main function
     global basicFont, basicFontSize
     basicFontSize = 20
     basicFont = pygame.font.Font('freesansbold.ttf', basicFontSize)
-
+    # clock
     fpsClock = pygame.time.Clock()
     # display window with parameters
     displaySurf = pygame.display.set_mode((windowWidth, windowHeight))
