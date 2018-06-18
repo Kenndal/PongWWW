@@ -12,19 +12,19 @@ FileManager.readFile()
 fps = 200
 
 scoreSpace = 50  # free space under area to display scores
-windowWidth = int(FileManager.programElements['width'])
-windowHeight = int(FileManager.programElements['height'])
+windowWidth = FileManager.programElements['width']
+windowHeight = FileManager.programElements['height']
 areaHeight = windowHeight - scoreSpace
-lineThickness = int(FileManager.programElements['lineThickness'])  # thickness of lines in program
+lineThickness = FileManager.programElements['lineThickness']  # thickness of lines in program
 padSize = 50  # size of game pad
 padDistance = 20  # distance from the area edges
 
 # set up the colors
 # background color is always black
-borderLinesColor = eval(FileManager.programElements['elementsColor'])
-padColor = eval(FileManager.programElements['padColor'])
-ballColor = eval(FileManager.programElements['ballColor'])
-menuColor = eval(FileManager.programElements['menuColor'])
+borderLinesColor = FileManager.programElements['elementsColor']
+padColor = FileManager.programElements['padColor']
+ballColor = FileManager.programElements['ballColor']
+menuColor = FileManager.programElements['menuColor']
 
 
 # function to draw game area
@@ -56,6 +56,7 @@ def drawBall(ball):
 
 # function to changing the ball's position
 def moveBall(ball, ballDirX, ballDirY, ball_Speed):
+    # ball speed tells how many pixels ball is moved
     ball.x += (ballDirX * ball_Speed)
     ball.y += (ballDirY * ball_Speed)
     return ball  # return new ball's position
@@ -65,10 +66,10 @@ def moveBall(ball, ballDirX, ballDirY, ball_Speed):
 # function returning the new ball's directions
 def checkEdgeCollision(ball, ballDirX, ballDirY):
     # if ball reach the top or bottom border, the Y direction is changing to opposite
-    if ball.top == lineThickness or ball.bottom == (areaHeight - lineThickness):
+    if ball.top <= lineThickness or ball.bottom >= (areaHeight - lineThickness):
         ballDirY = ballDirY * -1
     # if ball reach the left or right border line, the X direction is changing to opposite
-    if ball.left == lineThickness or ball.right == (windowWidth - lineThickness):
+    if ball.left <= lineThickness or ball.right >= (windowWidth - lineThickness):
         ballDirX = ballDirX * -1
     return ballDirX, ballDirY
 
@@ -76,15 +77,15 @@ def checkEdgeCollision(ball, ballDirX, ballDirY):
 # function to change ball direction when is hit by pad
 def checkHitBall(ball, pad1, pad2, ballDirX):
     """ ballDir = -1 -> pad1 may hit the ball
-        ball is hit when pad1.right == ball.left
+        ball is hit when pad1.right >= ball.left, >= is required, because ball can change the speed
         ball.top is lower when pad.top is smaller
         ball.bottom is hither when pad.bottom is bigger
     """
-    if ballDirX == -1 and pad1.right == ball.left and pad1.top <= ball.top and pad1.bottom >= ball.bottom:
+    if ballDirX == -1 and pad1.right >= ball.left and pad1.top <= ball.top and pad1.bottom >= ball.bottom:
         return -1
     # ballDir = 1 -> pad2 may hit the ball
     # ball is hit when pad1.left == ball.right
-    elif ballDirX == 1 and pad2.left == ball.right and pad2.top <= ball.top and pad2.bottom >= ball.bottom:
+    elif ballDirX == 1 and pad2.left <= ball.right and pad2.top <= ball.top and pad2.bottom >= ball.bottom:
         return -1
     else:
         return 1
@@ -92,7 +93,7 @@ def checkHitBall(ball, pad1, pad2, ballDirX):
 
 # if ball hits left or right border line, player one gets 1 point
 def checkPointScoredPlayerOne(ball, score):
-    if ball.right == windowWidth - lineThickness:
+    if ball.right >= windowWidth - lineThickness:
         score += 1
         return score
     else:
@@ -101,7 +102,7 @@ def checkPointScoredPlayerOne(ball, score):
 
 # if ball hits left or right border line, player one gets 1 point
 def checkPointScoredPlayerTwo(ball, score):
-    if ball.left == lineThickness:
+    if ball.left <= lineThickness:
         score += 1
         return score
     else:
@@ -249,23 +250,23 @@ def main():  # main function
         if keys[pygame.K_UP]:
             pad1.y += -3
         if keys[pygame.K_1]:
-            ballSpeed = 0.5
-        if keys[pygame.K_2]:
-            ballSpeed = 0.55
-        if keys[pygame.K_3]:
-            ballSpeed = 0.6
-        if keys[pygame.K_4]:
-            ballSpeed = 0.65
-        if keys[pygame.K_5]:
-            ballSpeed = 0.7
-        if keys[pygame.K_6]:
-            ballSpeed = 0.75
-        if keys[pygame.K_7]:
-            ballSpeed = 0.8
-        if keys[pygame.K_8]:
-            ballSpeed = 0.9
-        if keys[pygame.K_9]:
             ballSpeed = 1
+        if keys[pygame.K_2]:
+            ballSpeed = 2
+        if keys[pygame.K_3]:
+            ballSpeed = 3
+        if keys[pygame.K_4]:
+            ballSpeed = 4
+        if keys[pygame.K_5]:
+            ballSpeed = 5
+        if keys[pygame.K_6]:
+            ballSpeed = 6
+        if keys[pygame.K_7]:
+            ballSpeed = 7
+        if keys[pygame.K_8]:
+            ballSpeed = 8
+        if keys[pygame.K_9]:
+            ballSpeed = 9
 
         drawArea()
         drawBall(ball)
