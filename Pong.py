@@ -122,10 +122,27 @@ def displayScore(scorePlayerOne, scorePlayerTwo):
     displaySurf.blit(resultSurfTwo, resultRectTwo)
 
 
+def aiPlayer(pad, ball, botLevel):
+        if botLevel:
+            if pad.centery > ball.y:
+                pad.y += - 5
+            if pad.centery < ball.y:
+                pad.y += 5
+            return pad
+        else:
+            if pad.centery > ball.y:
+                pad.y += - 3
+            if pad.centery < ball.y:
+                pad.y += 3
+            return pad
+
+
 # Pause game and display same features of program
 def paused():
 
     reset = False
+    easyLevel = False
+    hardLevel = False
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(1)
     # display "Pause" word
@@ -155,6 +172,30 @@ def paused():
     insRect = (windowWidth / 4 + windowWidth / 15, 2 * windowHeight / 3 + windowHeight / 20)
     displaySurf.blit(insSurf, insRect)
 
+    # display "AI" word
+    aiSurf = basicFont.render('AI', True, menuColor)
+    aiRect = aiSurf.get_rect()
+    aiRect = (windowWidth/17, windowHeight/17)
+    displaySurf.blit(aiSurf, aiRect)
+
+    easyButton = pygame.Rect((windowWidth/17, windowHeight/10), (windowWidth/7, windowHeight/13))
+    easySurf = basicFont.render('Easy', True, menuColor)
+    easyRect = easySurf.get_rect()
+    easyRect = (windowWidth/17 + windowWidth/38, windowHeight/10 + windowHeight/38)
+    displaySurf.blit(easySurf, easyRect)
+
+    hardButton = pygame.Rect((windowWidth / 17, 2*windowHeight / 10), (windowWidth / 7, windowHeight / 13))
+    hardSurf = basicFont.render('Hard', True, menuColor)
+    hardRect = hardSurf.get_rect()
+    hardRect = (windowWidth / 17 + windowWidth / 38, 2*windowHeight / 10 + windowHeight / 38)
+    displaySurf.blit(hardSurf, hardRect)
+
+    noneButton = pygame.Rect((windowWidth / 17, 3 * windowHeight / 10), (windowWidth / 7, windowHeight / 13))
+    noneSurf = basicFont.render('None', True, menuColor)
+    noneRect = noneSurf.get_rect()
+    noneRect = (windowWidth / 17 + windowWidth / 38, 3 * windowHeight / 10 + windowHeight / 38)
+    displaySurf.blit(noneSurf, noneRect)
+
     # pause loop
     while pause:
         for event in pygame.event.get():
@@ -171,14 +212,26 @@ def paused():
                 if insButton.collidepoint(mouse_pos):
                     img = Image.open("PongIns.png")
                     img.show()
+                if easyButton.collidepoint(mouse_pos):
+                    easyLevel = True
+                    hardLevel = False
+                if hardButton.collidepoint(mouse_pos):
+                    easyLevel = False
+                    hardLevel = True
+                if noneButton.collidepoint(mouse_pos):
+                    easyLevel = False
+                    hardLevel = False
 
         # draw buttons
         pygame.draw.rect(displaySurf, menuColor, continueButton, int(lineThickness / 4))
         pygame.draw.rect(displaySurf, menuColor, resetButton, int(lineThickness / 4))
         pygame.draw.rect(displaySurf, menuColor, insButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, menuColor, easyButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, menuColor, hardButton, int(lineThickness / 4))
+        pygame.draw.rect(displaySurf, menuColor, noneButton, int(lineThickness / 4))
         pygame.display.update()
         clock.tick(fps)
-    return reset
+    return reset, easyLevel, hardLevel
 
 
 def main():  # main function
@@ -226,6 +279,12 @@ def main():  # main function
     ballSpeed = 1
     pygame.mouse.set_visible(0)  # make cursor invisible
 
+    # Bot level
+    botLevel = False
+    botLevelEasy = False
+    botLevelHard = False
+
+    reset = False
     # main Loop
     while True:
         for event in pygame.event.get():
@@ -238,17 +297,27 @@ def main():  # main function
                 pad2.y = mouseY
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    if paused():
+                    reset, botLevelEasy, botLevelHard = paused()
+                    if reset:
                         scorePlayerTwo = 0
                         scorePlayerOne = 0
-                    pygame.mouse.set_visible(0)  # make cursor invisible
+                    pygame.mouse.set_visible(0)  # make cursor invisible after exit pause
 
         # first player control with keys UP and DOWN
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_DOWN]:
-            pad1.y += 3
-        if keys[pygame.K_UP]:
-            pad1.y += -3
+        if botLevelEasy or botLevelHard:
+            if botLevelEasy:
+                botLevel = False
+                pad1 = aiPlayer(pad1, ball, botLevel)
+            if botLevelHard:
+                botLevel = True
+                pad1 = aiPlayer(pad1, ball, botLevel)
+        else:
+            if keys[pygame.K_DOWN]:
+                pad1.y += 3
+            if keys[pygame.K_UP]:
+                pad1.y += -3
+
         if keys[pygame.K_1]:
             ballSpeed = 1
         if keys[pygame.K_2]:
